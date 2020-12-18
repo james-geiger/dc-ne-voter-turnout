@@ -1,0 +1,63 @@
+Codebook – Created 10/20/2020
+Dataset: ACSPUMS1Y2018
+
+Variables: 
+RAC1P - Recoded detailed race code
+PWGTP - PUMS person weight
+SEX - Sex
+AGEP - Age
+
+
+RAC1P - Recoded detailed race code
+Topics: 
+Race and Ethnicity
+Suggested Weight : PWGTP
+Description : 
+Recoded detailed race code
+Values: 
+1 - White alone
+2 - Black or African American alone
+3 - American Indian alone
+4 - Alaska Native alone
+5 - American Indian and Alaska Native tribes specified; or American Indian or Alaska Native, not specified and no other races
+6 - Asian alone
+7 - Native Hawaiian and Other Pacific Islander alone
+8 - Some other race alone
+9 - Two or More Races
+
+PWGTP - PUMS person weight
+Topics: 
+Description : 
+PUMS person weight Variable Universe Description: ALL<br>Valid Range: 1 to 9,999
+Values: 
+1,9999 - Continuous values of PWGTP
+
+SEX - Sex
+Topics: 
+Age and Sex
+Populations and People
+Suggested Weight : PWGTP
+Description : 
+Sex Variable Universe Description: ALL
+Values: 
+1 - Male
+2 - Female
+
+AGEP - Age
+Topics: 
+Age and Sex
+Populations and People
+Suggested Weight : PWGTP
+Description : 
+Age
+Values: 
+00 - Under 1 year
+1,99 - 1 to 99 years (Top-coded***)
+
+
+
+Selected Geographies (ucgid): 
+7950000US3100901 -- Douglas County--Omaha City (Northwest) PUMA, Nebraska
+7950000US3100904 -- Douglas County--Omaha City (Southeast) PUMA, Nebraska
+7950000US3100903 -- Douglas County--Omaha City (Northeast) PUMA, Nebraska
+7950000US3100902 -- Douglas County--Omaha City (Southwest) PUMA, Nebraska
