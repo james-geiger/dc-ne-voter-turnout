@@ -1,0 +1,1065 @@
+---
+title: Historical Context and Current Trends in Predicting Voter Turnout in Douglas
+  County, Nebraska
+author:
+- Yuxuan Chen[^1]
+- Ramesh Danuwar[^3]
+- James M Geiger, MA[^2]
+- A.J. Guevara[^2]
+- Pratik Kandel[^3]
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  bookdown::pdf_document2:
+    toc: no
+    number_sections: yes
+    extra_dependencies: float
+  html_document:
+    df_print: paged
+abstract: Historically, the trend in voter participation for elections in the United
+  States is based on the expansion of voting rights. Voter turnout becomes gradually
+  larger over the years as access to voting is made easier and more equitable.  In
+  this research, the analysis of voter turnout will be focused on Douglas County,
+  Nebraska. Using public data from the Douglas County Election Commission and the
+  United States Census Bureau, we identify a positive trend in voter registration
+  in the past 20 years, especially among voters who identify as other- or non-partisan.
+  We furthermore identify an upward trend in population growth among White residents
+  while the population of other demographic groups remains flat. Ultimately, we present
+  a preliminary model that local election commissions could employ to predict voter
+  turnout by predicting voter turnout for the 2020 general election.  The results
+  of the preliminary model are promising—the model was able to predict turnout to
+  a difference within 3,000 voters.
+csl: apa-sixth-ed.csl
+references:
+- id: dcvoteturnout
+  title: Douglas County Voter Turnout
+  author:
+  - literal: Douglas County Election Commission
+  URL: https://www.votedouglascounty.com/voter_turnout.aspx
+  type: dataset
+  accessed:
+    year: 2020
+    month: 10
+  issued:
+    year: 2020
+    month: 6
+- id: dcprecinctmap
+  title: Douglas County Election Voter Precinct Maps
+  author:
+  - literal: Douglas County Election Commission
+  URL: https://www.votedouglascounty.com/maps.aspx
+  type: dataset
+  accessed:
+    year: 2020
+    month: 10
+  issued:
+    year: 2020
+    month: 1
+- id: pumsdata
+  title: Public Use Microdata Sample (PUMS)
+  author:
+  - literal: United States Census Bureau
+  URL: https://www.census.gov/programs-surveys/acs/microdata.html
+  type: dataset
+  accessed:
+    year: 2020
+    month: 10
+  issued:
+    year: 2020
+    month: 10
+- id: pumamaps
+  title: 2010 Census Public Use Microdata Area (PUMA) Reference Maps
+  author:
+  - literal: United States Census Bureau
+  URL: https://www.census.gov/geographies/reference-maps/2010/geo/2010-pumas.html
+  type: dataset
+  accessed:
+    year: 2020
+    month: 10
+  issued:
+    year: 2019
+    month: 4
+- id: shapefiles
+  title: Shapefiles
+  author:
+  - literal: ArcGIS
+  type: webpage
+  URL: https://doc.arcgis.com/en/arcgis-online/reference/shapefiles.htm
+  accessed:
+    year: 2020
+    month: 10
+- id: acs
+  title: American Community Survey (ACS)
+  author:
+  - literal: United States Census Bureau
+  URL: https://www.census.gov/programs-surveys/acs
+  accessed:
+    year: 2020
+    month: 10
+- id: tidyversepkg
+  title: Welcome to the tidyverse
+  author:
+  - literal: Wickham, H., et al.
+  issued:
+    year: 2019
+  type: article-journal
+  container-title: Journal of Open Source Software
+  volume: 4
+  number: 43
+  page: 1686
+  doi: 10.21105/joss.01686
+- id: readxlpkg
+  author:
+  - literal: Wickham, H. and Bryan, J.
+  title: 'readxl: Read Excel Files'
+  issued:
+    year: 2019
+  type: webpage
+  URL: https://CRAN.R-project.org/package=readxl
+- id: reshapepkg
+  author:
+  - literal: Wickham, H.
+  title: 'Reshaping Data with the reshape Package'
+  issued:
+    year: 2007
+  type: article-journal
+  container-title: Journal of Statistical Software
+  volume: 21
+  number: 12
+  page: 1-20
+  URL: http://www.jstatsoft.org/v21/i12/
+- id: ggplotpkg
+  title: 'ggplot2: Elegant Graphics for Data Analysis'
+  author:
+  - literal: Wickham, H.
+  publisher: Springer-Verlag New York
+  type: book
+  issued:
+    year: 2016
+  URL: https://ggplot2.tidyverse.org
+- id: sfpkg
+  title: 'Simple Features for R: Standardized Support for Spatial Vector Data'
+  author:
+  - literal: Pebesma, E.
+  issued:
+    year: 2018
+  type: article-journal
+  container-title: The R Journal
+  volume: 10
+  number: 1
+  URL: https://doi.org/10.32614/RJ-2018-009
+- id: scalespkg
+  title: 'scales: Scale Functions for Visualization'
+  author:
+  - literal: Wickham, H. and Seidel, D.
+  issued:
+    year: 2020
+  type: webpage
+  URL: https://CRAN.R-project.org/package=scales
+- id: ansolabehere
+  title: 'Gender, Race, Age, and Voting: A Research Note'
+  author:
+  - literal: Ansolabehere, S. and Hersh, E.
+  type: article
+  container-title: Proceedings of the American Political Science Association Annual
+    Meeting
+  issued:
+    year: 2011
+    month: 8
+  URL: "https://ssrn.com/abstract=1901654"
+- id: rpkg
+  title: "R: A Language and Environment for Statistical Computing"
+  author:
+    - literal: "R Core Team"
+  type: webpage
+  issued:
+    - year: 2020
+  URL: "https://www.R-project.org/"
+- id: rstudiopkg
+  title: "RStudio: Integrated Development for R."
+  author:
+    - literal: "RStudio Team"
+  type: webpage
+  issued:
+    - year: 2020
+  URL: "https://www.rstudio.com/"
+nocite: |
+  @*
+---
+
+[^1]: University of Nebraska Lincoln, Architectural Engineering
+[^2]: University of Nebraska Omaha, Data Science
+[^3]: University of Nebraska Omaha, Management and Information Systems
+
+```{r setup, include=FALSE}
+  knitr::opts_chunk$set(include = FALSE, echo=FALSE, fig.pos = "tph", out.extra = "", message=FALSE, warning=FALSE)
+options(scipen=999)
+library(tidyverse)
+library(readxl)
+library(reshape2)
+library(sf)
+library(scales)
+theme <- theme_grey() +
+  theme(
+    plot.caption = element_text(hjust = 0),
+    legend.position = "bottom"
+  )
+```
+
+```{r}
+##
+##
+##  All R cells required to make this document are presented first.
+##  Code cells are provided in chronological order, following the text.
+##
+##
+
+# load each election data detail file into individual variables
+gubernatorial_primary_98 <- read_excel('data/1998-gubernatorial-primary.xls', sheet='detail')
+gubernatorial_general_98 <- read_excel('data/1998-gubernatorial-general.xls', sheet='detail')
+gubernatorial_primary_02 <- read_excel('data/2002-gubernatorial-primary.xls', sheet='detail')
+gubernatorial_general_02 <- read_excel('data/2002-gubernatorial-general.xls', sheet='detail')
+gubernatorial_primary_06 <- read_excel('data/2006-gubernatorial-primary.xls', sheet='detail')
+gubernatorial_general_06 <- read_excel('data/2006-gubernatorial-general.xls', sheet='detail')
+gubernatorial_primary_10 <- read_excel('data/2010-gubernatorial-primary.xls', sheet='detail')
+gubernatorial_general_10 <- read_excel('data/2010-gubernatorial-general.xls', sheet='detail')
+gubernatorial_primary_14 <- read_excel('data/2014-gubernatorial-primary.xls', sheet='detail')
+gubernatorial_general_14 <- read_excel('data/2014-gubernatorial-general.xls', sheet='detail')
+gubernatorial_primary_18 <- read_excel('data/2018-gubernatorial-primary.xlsx', sheet='detail')
+gubernatorial_general_18 <- read_excel('data/2018-gubernatorial-general.xls', sheet='detail')
+presidential_primary_00 <- read_excel('data/2000-presidential-primary.xls', sheet='detail')
+presidential_general_00 <- read_excel('data/2000-presidential-general.xls', sheet='detail')
+presidential_primary_04 <- read_excel('data/2004-presidential-primary.xls', sheet='detail')
+presidential_general_04 <- read_excel('data/2004-presidential-general.xls', sheet='detail')
+presidential_primary_08 <- read_excel('data/2008-presidential-primary.xls', sheet='detail')
+presidential_general_08 <- read_excel('data/2008-presidential-general.xls', sheet='detail')
+presidential_primary_12 <- read_excel('data/2012-presidential-primary.xls', sheet='detail')
+presidential_general_12 <- read_excel('data/2012-presidential-general.xls', sheet='detail')
+presidential_primary_16 <- read_excel('data/2016-presidential-primary.xls', sheet='detail')
+presidential_general_16 <- read_excel('data/2016-presidential-general.xls', sheet='detail')
+presidential_primary_20 <- read_excel('data/2020-presidential-primary.xls', sheet='detail')
+```
+
+```{r}
+# drop column percentages (we'll add these back after making some manipulations to standardize the dataset)
+gubernatorial_primary_98 <- gubernatorial_primary_98[-c(4,7,10,13,16)]
+gubernatorial_general_98 <- gubernatorial_general_98[-c(4,7,10,13,16)]
+gubernatorial_primary_02 <- gubernatorial_primary_02[-c(4,7,10,13,16)]
+gubernatorial_general_02 <- gubernatorial_general_02[-c(4,7,10,13,16)]
+gubernatorial_primary_06 <- gubernatorial_primary_06[-c(4,7,10,13,16,19)]
+gubernatorial_general_06 <- gubernatorial_general_06[-c(4,7,10,13,16,19)]
+gubernatorial_primary_10 <- gubernatorial_primary_10[-c(4,7,10,13)]
+gubernatorial_general_10 <- gubernatorial_general_10[-c(4,7,10,13,16)]
+gubernatorial_primary_14 <- gubernatorial_primary_14[-c(4,7,10,13,16)]
+gubernatorial_general_14 <- gubernatorial_general_14[-c(4,7,10,13,16)]
+gubernatorial_primary_18 <- gubernatorial_primary_18[-c(4,7,10,13,16)]
+gubernatorial_general_18 <- gubernatorial_general_18[-c(4,7,10,13,16)]
+presidential_primary_00 <- presidential_primary_00[-c(4,7,10,13,16)]
+presidential_general_00 <- presidential_general_00[-c(4,7,10,13,16)]
+presidential_primary_04 <- presidential_primary_04[-c(4,7,10,13,16,19)]
+presidential_general_04 <- presidential_general_04[-c(4,7,10,13,16,19,22)]
+presidential_primary_08 <- presidential_primary_08[-c(4,7,10,13,16,19)]
+presidential_general_08 <- presidential_general_08[-c(4,7,10,13,16,19,22)]
+presidential_primary_12 <- presidential_primary_12[-c(4,7,10,13,16,19)]
+presidential_general_12 <- presidential_general_12[-c(4,7,10,13,16,19)]
+presidential_primary_16 <- presidential_primary_16[-c(4,7,10,13,16)]
+presidential_general_16 <- presidential_general_16[-c(4,7,10,13,16)]
+presidential_primary_20 <- presidential_primary_20[-c(4,7,10,13,16)]
+```
+
+```{r}
+# Different election years had different third parties, including the Greens, Libertarians, Nebraska Party, etc.
+# For simplicity's sake, we'll collapse these into a single 'third party' variable for registrations and votes.
+# This is a safe action to take when analyzing the broad data — third parties aren't currently strong enough acting individually to
+#   sway the outcome of the election.  However, when acting together there may be significant effects to the election outcome.
+presidential_primary_04 <- presidential_primary_04 %>%
+  mutate(
+    third_party_registered = `Lib Registered` + `Neb Registered`,
+    third_party_voted = `Lib Voted` + `Neb Voted`
+  )
+presidential_primary_04 <- presidential_primary_04[-c(10:13)]
+
+presidential_general_04 <- presidential_general_04 %>%
+  mutate(
+    third_party_registered = `Neb Registered` + `Grn Registered` + `Lib Registered`,
+    third_party_voted = `Neb Voted` + `Grn Voted` + `Lib Voted`
+  )
+presidential_general_04 <- presidential_general_04[-c(10:15)]
+
+gubernatorial_primary_06 <- gubernatorial_primary_06 %>%
+  mutate(
+    third_party_registered = `Neb Registered` + `Green Registered`,
+    third_party_voted = `Neb Voted` + `Green Voted`
+    )
+gubernatorial_primary_06 <- gubernatorial_primary_06[-c(8:11)]
+
+gubernatorial_general_06 <- gubernatorial_general_06 %>%
+  mutate(
+    third_party_registered = `Neb Registered` + `Grn Registered`,
+    third_party_voted = `Neb Voted` + `Grn Voted`
+    )
+gubernatorial_general_06 <- gubernatorial_general_06[-c(8:11)]
+
+presidential_primary_08 <- presidential_primary_08 %>%
+  mutate(
+    third_party_registered = `Neb Registered` + `Green Registered`,
+    third_party_voted = `Neb Voted` + `Green Voted`
+  )
+presidential_primary_08 <- presidential_primary_08[-c(8:11)]
+
+presidential_general_08 <- presidential_general_08 %>%
+  mutate(
+    third_party_registered = `Neb Registered` + `Grn Registered` + `Lib Registered`,
+    third_party_voted = `Neb Voted` + `Green Voted` + `Lib Voted`
+  )
+presidential_general_08 <- presidential_general_08[-c(8:11,14:15)]
+
+gubernatorial_primary_10 <- gubernatorial_primary_10 %>%
+  mutate(
+    third_party_registered = NA,
+    third_party_voted = NA
+  )
+
+presidential_primary_12 <- presidential_primary_12 %>%
+  mutate(
+    third_party_registered = `Lib Registered` + `Americans Elect Registered`,
+    third_party_voted = `Lib Voted` + `Americans Elect Voted`
+  )
+presidential_primary_12 <- presidential_primary_12[-c(10:13)]
+
+presidential_general_12 <- presidential_general_12 %>%
+  mutate(
+    third_party_registered = `Libertarian Registered` + `Americans Elect Registered`,
+    third_party_voted = `Libertarian Voted` + `Americans Elect Voted`
+  )
+presidential_general_12 <- presidential_general_12[-c(10:13)]
+```
+
+```{r}
+# standardize column names
+names(gubernatorial_primary_98) <- c('wp', 'total_registered', 'total_voted', 'democrat_registered', 'democrat_voted', 'republican_registered', 'republican_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+names(gubernatorial_general_98) <- c('wp', 'total_registered', 'total_voted', 'democrat_registered', 'democrat_voted', 'republican_registered', 'republican_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+
+names(gubernatorial_primary_02) <- c('wp', 'total_registered', 'total_voted', 'democrat_registered', 'democrat_voted', 'republican_registered', 'republican_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+names(gubernatorial_general_02) <- c('wp', 'total_registered', 'total_voted', 'democrat_registered', 'democrat_voted', 'republican_registered', 'republican_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+
+names(gubernatorial_primary_06) <- c('wp', 'total_registered', 'total_voted', 'democrat_registered', 'democrat_voted', 'republican_registered', 'republican_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+names(gubernatorial_general_06) <- c('wp', 'total_registered', 'total_voted', 'republican_registered', 'republican_voted', 'democrat_registered', 'democrat_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+
+names(gubernatorial_primary_10) <- c('wp', 'total_registered', 'total_voted', 'republican_registered', 'republican_voted', 'democrat_registered', 'democrat_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+names(gubernatorial_general_10) <- c('wp', 'total_registered', 'total_voted', 'republican_registered', 'republican_voted', 'democrat_registered', 'democrat_voted', 'third_party_registered', 'third_party_voted', 'nonpartisan_registered', 'nonpartisan_voted')
+
+names(gubernatorial_primary_14) <- c('wp', 'total_registered', 'total_voted', 'republican_registered', 'republican_voted', 'democrat_registered', 'democrat_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+names(gubernatorial_general_14) <- c('wp', 'total_registered', 'total_voted', 'republican_registered', 'republican_voted', 'democrat_registered', 'democrat_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+
+names(gubernatorial_primary_18) <- c('wp', 'total_registered', 'total_voted', 'republican_registered', 'republican_voted', 'democrat_registered', 'democrat_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+names(gubernatorial_general_18) <- c('wp', 'total_registered', 'total_voted', 'republican_registered', 'republican_voted', 'democrat_registered', 'democrat_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+
+names(presidential_primary_00) <- c('wp', 'total_registered', 'total_voted', 'democrat_registered', 'democrat_voted', 'republican_registered', 'republican_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+names(presidential_general_00) <- c('wp', 'total_registered', 'total_voted', 'democrat_registered', 'democrat_voted', 'republican_registered', 'republican_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+
+names(presidential_primary_04) <- c('wp', 'total_registered', 'total_voted', 'democrat_registered', 'democrat_voted', 'republican_registered', 'republican_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+names(presidential_general_04) <- c('wp', 'total_registered', 'total_voted', 'democrat_registered', 'democrat_voted', 'republican_registered', 'republican_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+
+names(presidential_primary_08) <- c('wp', 'total_registered', 'total_voted', 'democrat_registered', 'democrat_voted', 'republican_registered', 'republican_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+names(presidential_general_08) <- c('wp', 'total_registered', 'total_voted', 'democrat_registered', 'democrat_voted', 'republican_registered', 'republican_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+
+names(presidential_primary_12) <- c('wp', 'total_registered', 'total_voted', 'republican_registered', 'republican_voted', 'democrat_registered', 'democrat_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+names(presidential_general_12) <- c('wp', 'total_registered', 'total_voted', 'republican_registered', 'republican_voted', 'democrat_registered', 'democrat_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+
+names(presidential_primary_16) <- c('wp', 'total_registered', 'total_voted', 'republican_registered', 'republican_voted', 'democrat_registered', 'democrat_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+names(presidential_general_16) <- c('wp', 'total_registered', 'total_voted', 'republican_registered', 'republican_voted', 'democrat_registered', 'democrat_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+
+names(presidential_primary_20) <- c('wp', 'total_registered', 'total_voted', 'republican_registered', 'republican_voted', 'democrat_registered', 'democrat_voted', 'nonpartisan_registered', 'nonpartisan_voted', 'third_party_registered', 'third_party_voted')
+```
+
+```{r}
+# label all gubernatorial elections
+gubernatorial_primary_98$election_cycle = 'gubernatorial'
+gubernatorial_general_98$election_cycle = 'gubernatorial'
+gubernatorial_primary_02$election_cycle = 'gubernatorial'
+gubernatorial_general_02$election_cycle = 'gubernatorial'
+gubernatorial_primary_06$election_cycle = 'gubernatorial'
+gubernatorial_general_06$election_cycle = 'gubernatorial'
+gubernatorial_primary_10$election_cycle = 'gubernatorial'
+gubernatorial_general_10$election_cycle = 'gubernatorial'
+gubernatorial_primary_14$election_cycle = 'gubernatorial'
+gubernatorial_general_14$election_cycle = 'gubernatorial'
+gubernatorial_primary_18$election_cycle = 'gubernatorial'
+gubernatorial_general_18$election_cycle = 'gubernatorial'
+
+# label all presidential elections
+presidential_primary_00$election_cycle = 'presidential'
+presidential_general_00$election_cycle = 'presidential'
+presidential_primary_04$election_cycle = 'presidential'
+presidential_general_04$election_cycle = 'presidential'
+presidential_primary_08$election_cycle = 'presidential'
+presidential_general_08$election_cycle = 'presidential'
+presidential_primary_12$election_cycle = 'presidential'
+presidential_general_12$election_cycle = 'presidential'
+presidential_primary_16$election_cycle = 'presidential'
+presidential_general_16$election_cycle = 'presidential'
+presidential_primary_20$election_cycle = 'presidential'
+
+# label all primary elections
+gubernatorial_primary_98$election_type = 'primary'
+presidential_primary_00$election_type = 'primary'
+gubernatorial_primary_02$election_type = 'primary'
+presidential_primary_04$election_type = 'primary'
+gubernatorial_primary_06$election_type = 'primary'
+presidential_primary_08$election_type = 'primary'
+gubernatorial_primary_10$election_type = 'primary'
+presidential_primary_12$election_type = 'primary'
+gubernatorial_primary_14$election_type = 'primary'
+presidential_primary_16$election_type = 'primary'
+gubernatorial_primary_18$election_type = 'primary'
+presidential_primary_20$election_type = 'primary'
+
+# label all general elections
+gubernatorial_general_98$election_type = 'general'
+presidential_general_00$election_type = 'general'
+gubernatorial_general_02$election_type = 'general'
+presidential_general_04$election_type = 'general'
+gubernatorial_general_06$election_type = 'general'
+presidential_general_08$election_type = 'general'
+gubernatorial_general_10$election_type = 'general'
+presidential_general_12$election_type = 'general'
+gubernatorial_general_14$election_type = 'general'
+presidential_general_16$election_type = 'general'
+gubernatorial_general_18$election_type = 'general'
+
+# label all years
+gubernatorial_primary_98$election_year = 1998
+gubernatorial_general_98$election_year = 1998
+gubernatorial_primary_02$election_year = 2002
+gubernatorial_general_02$election_year = 2002
+gubernatorial_primary_06$election_year = 2006
+gubernatorial_general_06$election_year = 2006
+gubernatorial_primary_10$election_year = 2010
+gubernatorial_general_10$election_year = 2010
+gubernatorial_primary_14$election_year = 2014
+gubernatorial_general_14$election_year = 2014
+gubernatorial_primary_18$election_year = 2018
+gubernatorial_general_18$election_year = 2018
+presidential_primary_00$election_year = 2000
+presidential_general_00$election_year = 2000
+presidential_primary_04$election_year = 2004
+presidential_general_04$election_year = 2004
+presidential_primary_08$election_year = 2008
+presidential_general_08$election_year = 2008
+presidential_primary_12$election_year = 2012
+presidential_general_12$election_year = 2012
+presidential_primary_16$election_year = 2016
+presidential_general_16$election_year = 2016
+presidential_primary_20$election_year = 2020
+```
+
+```{r}
+# combine the individual dataframes into one
+elections <- rbind (
+  gubernatorial_primary_98,
+  gubernatorial_general_98,
+  gubernatorial_primary_02,
+  gubernatorial_general_02,
+  gubernatorial_primary_06,
+  gubernatorial_general_06,
+  gubernatorial_primary_10,
+  gubernatorial_general_10,
+  gubernatorial_primary_14,
+  gubernatorial_general_14,
+  gubernatorial_primary_18,
+  gubernatorial_general_18,
+  presidential_primary_00,
+  presidential_general_00,
+  presidential_primary_04,
+  presidential_general_04,
+  presidential_primary_08,
+  presidential_general_08,
+  presidential_primary_12,
+  presidential_general_12,
+  presidential_primary_16,
+  presidential_general_16,
+  presidential_primary_20
+)
+
+# some years, certain precincts didn't have any turnout by voter registration type.  We'll replace these NA values with zeroes.
+elections <- replace_na(elections, list(democrat_registered = 0, democrat_voted = 0, republican_registered = 0, republican_voted = 0, third_party_registered = 0, third_party_voted = 0))
+
+# separate the ward for ease of aggregation
+elections$ward <- str_extract(elections$wp, '([0-9])+')
+
+elections_long <- melt(elections, id.vars = c('wp', 'election_year', 'election_cycle', 'election_type'))
+```
+
+```{r}
+census_2006 <- read.csv('census-data/csv/2006-census-pums.csv')
+census_2008 <- read.csv('census-data/csv/2008-census-pums.csv')
+census_2010 <- read.csv('census-data/csv/2010-census-pums.csv')
+census_2012 <- read.csv('census-data/csv/2012-census-pums.csv')
+census_2014 <- read.csv('census-data/csv/2014-census-pums.csv')
+census_2016 <- read.csv('census-data/csv/2016-census-pums.csv')
+census_2018 <- read.csv('census-data/csv/2018-census-pums.csv')
+
+census_2006$vintage_year <- 2006
+census_2008$vintage_year <- 2008
+census_2010$vintage_year <- 2010
+census_2012$vintage_year <- 2012
+census_2014$vintage_year <- 2014
+census_2016$vintage_year <- 2016
+census_2018$vintage_year <- 2018
+
+demographics <- rbind (
+  census_2006,
+  census_2008,
+  census_2010,
+  census_2012,
+  census_2014,
+  census_2016,
+  census_2018
+)
+
+demographics <- demographics[-c(6, 7)]
+
+# read in douglas county voting precincts
+wpgeom <- st_read('precinct_shapes/Precincts_2020.shp')
+
+# read in public use microdata areas (https://www.census.gov/programs-surveys/geography/guidance/geo-areas/pumas.html)
+acegeom <- st_read('puma_shapes/tl_2019_31_puma10.shp')
+
+# limit geography to only douglas county
+acegeom <- acegeom %>%
+  filter(PUMACE10 %in% c("00901", "00902", "00903", "00904")) %>%
+  mutate(PUMACE10 = str_sub(PUMACE10, 3L, -1L))
+```
+
+```{r}
+# voter registrations total plot
+general_df <- elections %>%
+  group_by(election_type, election_cycle, election_year) %>%
+  summarise(
+    total_registered = sum(total_registered),
+    democrat_registered = sum(democrat_registered),
+    republican_registered = sum(republican_registered),
+    third_party_registered = sum(third_party_registered + nonpartisan_registered)
+  ) %>%
+  filter(election_year != 2020 & election_type == 'general') %>%
+  select(
+    election_cycle, election_year, democrat_registered, republican_registered, third_party_registered, total_registered
+  )
+general_df_melt <- melt(general_df, id.vars=c('election_cycle', 'election_year', 'election_type'))
+
+vreggeneral <- general_df_melt %>% filter(variable != 'total_registered')
+levels(vreggeneral$variable) <- c("Democrat", "Republican", "Nonpartisan/Third Party", "Total")
+vreggeneral$election_cycle <- as.factor(vreggeneral$election_cycle)
+levels(vreggeneral$election_cycle) <- c("Non-Presidential", "Presidential")
+
+# Number of Voter Registration in General Election
+voter_registration_totals_plot <- ggplot(vreggeneral, aes(x=factor(election_year), y=value, fill=variable)) +
+  geom_bar(stat="identity") +
+  scale_y_continuous(labels = comma) +
+  scale_x_discrete() +
+  scale_fill_manual(values = c("Democrat" = "#2166ac", "Republican" = "#b2182b", "Nonpartisan/Third Party" = "#66bd63")) +
+  coord_flip() + 
+  labs (
+    title="General Election Voter Registration Totals",
+    fill="Party Registration",
+    x = "Election Year",
+    y = "Voter Registration"
+  ) +
+  theme
+```
+
+```{r}
+# turnout by cycle plot
+pres_gub <- elections %>%
+  group_by(election_cycle, election_year) %>%
+  summarise(
+    total_registered = sum(total_registered),
+    total_voted = sum(total_voted),
+    democrat_registered = sum(democrat_registered),
+    democrat_voted = sum(democrat_voted),
+    republican_registered = sum(republican_registered),
+    republican_voted = sum(republican_voted),
+    third_party_registered = sum(third_party_registered + nonpartisan_registered),
+    third_party_voted = sum(third_party_voted + nonpartisan_voted)
+  ) %>%
+  filter(election_year != 2020) %>%
+  mutate(
+    total_turnout = total_voted/total_registered,
+    democrat_turnout = democrat_voted/democrat_registered,
+    republican_turnout = republican_voted/republican_registered,
+    third_party_turnout = third_party_voted/third_party_registered
+  ) %>%
+  select(
+    election_cycle, election_year, total_turnout, democrat_turnout, republican_turnout, third_party_turnout
+  )
+
+pres_gub_melt <- melt(pres_gub, id.vars=c('election_cycle', 'election_year'))
+
+levels(pres_gub_melt$variable) <- c("Total", "Democrat", "Republican", "Nonpartisan/Third Party")
+pres_gub_melt$election_cycle <- as.factor(pres_gub_melt$election_cycle)
+levels(pres_gub_melt$election_cycle) <- c("Non-Presidential", "Presidential")
+
+turnout_by_cycle_plot <- ggplot(pres_gub_melt, aes(x = election_year, y = value, color = election_cycle)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~variable) +
+  scale_y_continuous(labels = label_percent(accuracy = 1)) +
+  labs (
+    title="Election Turnout by Election Cycle",
+    x = "Election Year",
+    y = "Turnout",
+    color = "Election Cycle"
+  ) +
+  theme
+```
+
+```{r}
+# turnout_by_type_plot
+pri_vs_gen <- elections %>%
+  group_by(election_type, election_year) %>%
+  summarise(
+    total_registered = sum(total_registered),
+    total_voted = sum(total_voted),
+    democrat_registered = sum(democrat_registered),
+    democrat_voted = sum(democrat_voted),
+    republican_registered = sum(republican_registered),
+    republican_voted = sum(republican_voted),
+    third_party_registered = sum(third_party_registered + nonpartisan_registered),
+    third_party_voted = sum(third_party_voted + nonpartisan_voted)
+  ) %>%
+  filter(election_year != 2020) %>%
+  mutate(
+    total_turnout = total_voted/total_registered,
+    democrat_turnout = democrat_voted/democrat_registered,
+    republican_turnout = republican_voted/republican_registered,
+    third_party_turnout = third_party_voted/third_party_registered
+  ) %>%
+  select(
+    election_type, election_year, total_turnout, democrat_turnout, republican_turnout, third_party_turnout
+  )
+
+pri_vs_gen_melt <- melt(pri_vs_gen, id.vars=c('election_type', 'election_year'))
+
+# Plots about comparing the ratio of turnout for general and primary elections
+levels(pri_vs_gen_melt$variable) <- c("Total", "Democrat", "Republican", "Nonpartisan/Third Party")
+pri_vs_gen_melt$election_type <- as.factor(pri_vs_gen_melt$election_type)
+levels(pri_vs_gen_melt$election_type) <- c("General", "Primary")
+
+turnout_by_type_plot <- ggplot(pri_vs_gen_melt, aes(x = election_year, y = value, color = election_type)) +
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(labels = label_percent(accuracy = 1)) +
+  facet_wrap(~variable) +
+  labs (
+    title="Election Turnout by Election Type",
+    x = "Election Year",
+    y = "Turnout",
+    color = "Election Type"
+  ) +
+  theme
+```
+
+```{r}
+# turnout by precinct plot
+electionsByWard <- elections %>%
+  filter(election_year == 2020) %>%
+  mutate(
+    total_turnout = total_voted/total_registered,
+    democrat_turnout = democrat_voted/democrat_registered,
+    republican_turnout = republican_voted/republican_registered,
+    third_party_turnout = (nonpartisan_voted + third_party_voted)/(nonpartisan_registered + third_party_registered))
+
+electionsByWardGeom <- left_join(wpgeom, electionsByWard, by = c("Ward_Preci" = "wp"))
+
+# plot precincts, colored by total_turnout in the ward
+turnout_by_precinct_plot <- ggplot(electionsByWardGeom) +
+  geom_sf(aes(fill=total_turnout)) + 
+  coord_sf(crs = "+proj=merc") +
+  scale_fill_gradient2(
+    low = "white",
+    high = "#54278f",
+    na.value = "grey50",
+    guide = "colorbar",
+    aesthetics = "fill",
+    labels = label_percent(accuracy = 1)
+  ) +
+  theme_void() +
+  labs (
+    title = "Election Turnout by Precinct",
+    fill=NULL
+  )
+```
+
+```{r}
+# registration by precinct plot
+# democrat - republican registrations diverging
+voterRegistrationByWard <- elections %>%
+  mutate(
+    registration_weight = (democrat_registered/total_registered) - (republican_registered/total_registered),
+    partisan_registration_weight = ((third_party_registered + nonpartisan_registered) / total_registered ) - ((republican_registered + democrat_registered)/total_registered)
+  ) %>%
+  filter(election_year == 2020) %>%
+  select(wp, registration_weight, partisan_registration_weight)
+
+voterRegistrationByWardGeom <- left_join(wpgeom, voterRegistrationByWard, by = c("Ward_Preci" = "wp"))
+
+# plot precincts, colored by registration_weight
+registration_by_precinct_plot <- ggplot(voterRegistrationByWardGeom) +
+  geom_sf(aes(fill=registration_weight)) + 
+  coord_sf(crs = "+proj=merc") +
+  scale_fill_gradient2(
+    low = "#b2182b",
+    mid = "white",
+    high = "#2166ac",
+    limits = c(-0.8,0.8),
+    midpoint = 0,
+    na.value = "grey50",
+    guide = "colourbar",
+    aesthetics = "fill",
+    labels = label_percent(accuracy = 1)
+  ) +
+  labs(
+    title = "Proportion Republican vs Democrat Registrants by Precinct",
+    fill = NULL,
+    caption = ""
+  ) +
+  theme_void()
+```
+
+```{r}
+# partisanship by precinct plot
+# plot precincts, colored by registration_weight
+partisanship_by_precinct_plot <- ggplot(voterRegistrationByWardGeom) +
+  geom_sf(aes(fill=partisan_registration_weight)) +
+  coord_sf(crs = "+proj=merc") +
+  scale_fill_gradient2(
+    low = "#ffb400",
+    mid = "white",
+    high = "#b000ff",
+    limits = c(-0.75, -.25),
+    midpoint = -0.5,
+    na.value = "grey50",
+    guide = "colourbar",
+    aesthetics = "fill",
+    labels = label_percent(accuracy = 1)
+  ) +
+  labs(
+    title = "Proportion Partisan vs Nonpartisan/Third Party Registrants by Precinct",
+    fill = NULL,
+    caption = ""
+  ) +
+  theme_void()
+```
+
+```{r partisanship-by-precinct, include=FALSE, fig.align='center', fig.cap="Plot of voter registration weight by partisan affiliation. Precincts with higher totals of partisan (i.e. democrat or republican) registrants are displayed in darker shades of orange. Precincts with higher nonpartisan or third party registrants are displayed in darker shades of purple.", fig.dim=c(5, 2.5)}
+partisanship_by_precinct_plot
+
+#Figure \@ref(fig:partisanship-by-precinct)
+```
+
+```{r}
+# population growth trend plot
+demographics$sex_recode <- recode_factor(demographics$SEX, `1` = "Male", `2` = "Female")
+demographics$race_recode <- recode_factor(demographics$RAC1P, `1` = "White/Caucasian", `2` = "Black/African American", `3` = "American Indian", `4` = "Alaska Native", `5` = "American Indian/Alaska Native", `6` = "Asian", `7` = "Native Hawaiian/Pacific Islander", `8` = "Some other race", `9` = "Two or more races")
+demographics$race_recode_groups <- recode_factor(demographics$RAC1P, `1` = "White/Caucasian", `2` = "Black/African American", `3` = "Other Non-white", `4` = "Other Non-white", `5` = "Other Non-white", `6` = "Asian", `7` = "Other Non-white", `8` = "Other Non-white", `9` = "Two or more races")
+
+demographics <- demographics %>% rename(PUMACE10 = PUMA) %>% mutate(PUMACE10 = as.character(PUMACE10))
+
+demographicsByYear <- demographics %>% filter(vintage_year == 2018) %>% group_by(PUMACE10) %>% summarize(total = sum(PWGTP))
+demographicsByYearGeom <- left_join(acegeom, demographicsByYear)
+
+# plot change in total douglas county residents by year according to ACE
+demographicsByYear <- demographics %>% group_by(vintage_year) %>% summarize(total = sum(PWGTP))
+colnames(demographicsByYear) <- c("year", "total")
+
+demographicsByYearPlace <- demographics %>% group_by(PUMACE10, vintage_year) %>% summarize(total = sum(PWGTP))
+colnames(demographicsByYearPlace) <- c("locale", "year", "total")
+demographicsByYearPlace$locale <- recode(demographicsByYearPlace$locale, "901" = "Douglas County Northwest", "902" = "Douglas County Southwest", "903" = "Douglas County Northeast", "904" = "Douglas County Southeast" )
+
+# total residents in douglas county
+population_growth_trend_plot <- ggplot(demographicsByYear, aes(x = year, y = total)) +
+  geom_line() +
+  geom_point() +
+  stat_smooth(method='lm', formula = 'y ~ x', fullrange = TRUE) +
+  scale_y_continuous(labels = comma) +
+  scale_x_continuous(n.breaks = 8, limits = c(2006,2020)) +
+  labs(
+    title = "Overall Douglas County Population 2006-2018",
+    x = "Year",
+    y = "Population"
+  ) +
+  theme
+```
+
+```{r}
+demographicsByYearSex <- demographics %>% group_by(vintage_year, sex_recode ) %>% summarize(total = sum(PWGTP))
+colnames(demographicsByYearSex) <- c("year", "sex", "total")
+
+# total residents in douglas county by sex
+population_by_sex_plot <- ggplot(demographicsByYearSex, aes(x = year, y = total, color = sex)) +
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(labels = comma) +
+  scale_x_continuous(n.breaks = 7, limits = c(2006,2018)) +
+  labs(
+    title = "Douglas County Population 2006-2018 by Sex",
+    x = "Year",
+    y = "Population",
+    color = "Sex"
+  ) +
+  scale_color_manual(values=c("#33ccff", "#ff99aa")) +
+  theme
+```
+
+```{r population-by-sex, include=FALSE, fig.align='center', fig.cap="Plot of Douglas County population growth from 2006 to 2018, grouped by sex.  Females outnumber males overall, and growth between the two groups is uniform.", fig.dim=c(5.5, 3.5)}
+population_by_sex_plot
+```
+
+```{r}
+# population by race plot
+demographicsByYearRace <- demographics %>% group_by(vintage_year, race_recode_groups ) %>% summarize(total = sum(PWGTP))
+colnames(demographicsByYearRace) <- c("year", "race", "total")
+
+demographicsByRace <- demographics %>% group_by(PUMACE10, vintage_year, race_recode_groups ) %>% summarize(total = sum(PWGTP)) %>% filter(vintage_year == 2018) %>% ungroup() %>% select(PUMACE10, race_recode_groups, total)
+
+colnames(demographicsByRace) <- c("PUMACE10", "race", "total")
+
+demwide <- dcast(demographicsByRace, PUMACE10 ~ race)
+
+demwide <- demwide %>%
+  group_by(PUMACE10) %>%
+  mutate(
+    total = sum(`White/Caucasian`, `Black/African American`, `Other Non-white`, `Asian`, `Two or more races`)
+  ) %>%
+  mutate(
+    `White/Caucasian` = `White/Caucasian`/total,
+    `Black/African American` = `Black/African American`/total,
+   `Other Non-white` = `Other Non-white`/total,
+    `Asian` = `Asian`/total,
+    `Two or more races` = `Two or more races`/total
+  ) %>%
+  select(`White/Caucasian`, `Black/African American`, `Other Non-white`, `Asian`, `Two or more races`) %>%
+  ungroup()
+
+demwidenonwhite <- demwide %>%
+  group_by(PUMACE10) %>%
+  mutate(
+    total = sum(`White/Caucasian`, `Black/African American`, `Other Non-white`, `Asian`, `Two or more races`)
+  ) %>%
+  mutate(
+    `White/Caucasian` = `White/Caucasian`/total,
+    `All Other Races` = (`Black/African American` + `Other Non-white` + `Asian` + `Two or more races`)/total
+  ) %>%
+  select(`White/Caucasian`, `All Other Races`) %>%
+  ungroup()
+
+demographicsByRaceProp <- melt(demwide, id.vars="PUMACE10")
+demographicsByRaceNonWhiteProp <- melt(demwidenonwhite, id.vars="PUMACE10")
+
+colnames(demographicsByRaceProp) <- c("PUMACE10", "race", "total")
+colnames(demographicsByRaceNonWhiteProp) <- c("PUMACE10", "race", "total")
+
+demographicsByRaceGeom <- left_join(acegeom, demographicsByRace)
+demographicsByRacePropGeom <- left_join(acegeom, demographicsByRaceProp)
+
+demographicsByRaceNonWhitePropGeom <- left_join(acegeom, demographicsByRaceNonWhiteProp)
+
+# total residents in douglas county by race
+population_by_race_plot <- ggplot(demographicsByYearRace, aes(x = year, y = total, color = race)) +
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(labels = comma) +
+  scale_x_continuous(n.breaks = 7, limits = c(2006,2018)) +
+  labs(
+    title = "Douglas County Population 2006-2018 by Race",
+    x = "Year",
+    y = "Population",
+    color = "Race"
+  ) +
+  theme
+```
+
+```{r}
+# geography by race plot
+geography_by_race_plot <- ggplot(demographicsByRaceNonWhitePropGeom) +
+  geom_sf(aes(fill=total)) +
+  geom_sf(fill = NA, color = alpha("black", .1), size = 0.3, data=wpgeom) +
+  geom_sf(fill=NA, data=acegeom) +
+  coord_sf(crs = "+proj=merc") +
+  facet_wrap(~race, ncol=1) +
+  scale_fill_gradient2(
+    low = "#FFFFFF",
+    high = "#41ae76",
+    space = "Lab",
+    na.value = "grey50",
+    guide = "colourbar",
+    aesthetics = "fill",
+    labels = label_percent(accuracy = 1)
+  ) +
+  labs(
+    title = "Racial Proportions of Douglas County",
+    fill = NULL
+  ) +
+  theme_void()
+```
+
+```{r}
+# turnout predict plot
+model_data_primary <- elections %>%
+  filter(election_cycle == 'presidential' & election_type == 'primary') %>%
+  group_by(election_year) %>%
+  summarise(primary_registered = sum(total_registered), primary_voted = sum(total_voted))
+
+model_data_general <- elections %>%
+  filter(election_cycle == 'presidential' & election_type == 'general') %>%
+  group_by(election_year) %>%
+  summarise(general_registered = sum(total_registered), general_voted = sum(total_voted))
+
+model_data_general <- rbind(model_data_general, c(2020, 373516, NA)) #for 2020, voter registration as of the deadline for Nov 3 was 373,516
+
+model_data <- full_join(model_data_primary, model_data_general) %>%
+  mutate(primary_turnout = primary_voted/primary_registered, general_turnout = general_voted/general_registered) %>%
+  rowwise() %>%
+  mutate(registration_change = abs(general_registered - primary_registered))
+
+
+model_data_train <- model_data %>% filter(election_year < 2020)
+model_data_predict <- model_data %>% filter(election_year == 2020)
+
+model <- lm(general_voted ~ general_registered + primary_voted + registration_change, data=model_data_train)
+pred <- predict(model, model_data_predict)
+
+
+model_plot <- model_data %>% select(election_year, general_voted) %>% mutate(type = 'Actual') %>% filter(election_year < 2020)
+model_plot <- melt(model_plot, id.vars = c('election_year', 'type'), measure.vars = 'general_voted')
+model_plot <- rbind(model_plot, c(2020, 'Prediction', 'general_voted', round(pred)))
+model_plot$value <- as.numeric(model_plot$value)
+
+turnout_predict_plot <- ggplot(model_plot) +
+  geom_line(aes(x=election_year, y=value, group=type, color=type)) + 
+  geom_point(aes(x=election_year, y=value, group=type, color=type)) +
+  scale_y_continuous(label = comma) +
+  labs(
+    title="Predicting Voter Turnout in Douglas County",
+    x="Presidential Election Year",
+    y="Persons Voting",
+    color=NULL,
+    group=NULL
+  ) +
+  theme
+```
+
+```{r turnout-by-precinct, include=FALSE, fig.align='center', fig.cap="Plot of turnout by precinct in the 2020 presidential primary.   Election turnout is consistently higher during general elections both overall and across all party affiliations.  Overall, the highest turnout observed to date occurred during the 2008 general election.", fig.dim=c(5.5, 3.5)}
+turnout_by_precinct_plot
+```
+
+\newpage
+
+Voting in the United States continues to be a topic of interest for Americans. In the lead up to the 2020 presidential election in November, news media and reporting outlets have focused their attention on how elections in the United States are conducted.  Candidates for political office also have offered their opinions—going so far as the sitting president claiming that the election systems in the US are prone to fraud.  Between accusations of mass mail-in ballot fraud by the Trump administration and unsupported claims of a “stolen” election, it is important for every US citizen to understand voter registration, participation in elections, and the processes and systems in place to verify the results.
+
+It is clear that in order to successfully analyze voting trends in the United States, research must be conducted along with spending time and effort to provide meaningful analysis. With that in mind, the scope of this paper will focus on voting in Douglas County, Nebraska.  We selected this county due to its election commission's open and easy to access voter registration data and because this county has also tended to "swing" between voting for candidates of the two major political parties.
+
+We have organized our analysis in three main parts: First, we demonstrate our data acquisition and preparation process, next we explore and provide analysis of voting trends in Douglas County from 1998 2018, and finally we present a preliminary model to predict voting turnout in the 2020 election and beyond.  We also offer our concluding thoughts and future directions for research in this area.
+
+# Data
+
+## Sources
+
+Detailed voter registration and election result data are made openly available by the Douglas County, Nebraska Election Commission (election commission) on their website [@dcvoteturnout].  Because the Election Commission is responsible for the fair and accurate conduction of elections in the county as a whole, they provide data on both federal and municipal elections, including special issues elections that don't fall within a specific election year.  Since this project will focus on federal elections, we've limited our inclusion of data to presidential and non-presidential election years.  Douglas County provides voter turnout data from the 1996 election onward, however tabular data have only been available since 1998.  To avoid text mining, only federal election years since and including 1998 have been included in this analysis.
+
+Analyses of voter turnout easily lend themselves to exploration of results by geographic area.  Douglas County divides its election areas into wards and precincts.  In 2020, there were 451 precincts within eight wards.  The election commission provides, upon request, ESRI shapefiles [@shapefiles] of the local ward/precinct map [@dcprecinctmap].
+
+The United States Census Bureau is most widely known for its decennial national census.  While congressional redistricting relies solely on the 10-year census, the bureau also surveys and provides data in-between census years, known as the American Community Survey (ACS) [@acs].  The ACS data are generally provided in aggregate, however another Census Bureau product—the Public Use Microdata Sample (PUMS)—provides the same data gathered by the ACS in de-identified hyper-local form, down to the individual or housing unit [@pumsdata].  The PUMS can be paired with the Public Use Microdata Areas (PUMA) [@pumamaps] to aggregate the ACS into small areas at the county level.  While the decennial census is able to provide more detailed geographical information, the ACS combined with the PUMS provides a level of detail sufficient for exploratory analysis.
+
+## Cleaning and Preparation
+
+Data for this analysis were relatively clean by default—all data from the Douglas County Election Commission was available in Microsoft Excel format and was free from character encoding errors.  Data from the US Census Bureau was likewise available in comma-separated format and was easy to incorporate without further processing.  However, the election turnout data were in separate files across the 23 total elections included in this analysis.  Furthermore, column labels were not consistent across years and were often named differently or in a different order making it difficult to easily bind these files together.  Another unique difficulty in cleaning the data presented itself in the changing political landscape over the 20-year analysis period.  A number of "third parties" have grown and lost popularity since 1998 and the individual data files account for the most prevalent third parties that voted in that election.
+
+To process the data from the election commission we first selected only the variables of interest, dropping any columns and rows that the commission had computed.  To handle the "third party" issue mentioned previously, each of these individual parties were collapsed into a single column.  Although many analysis presented in this paper will further collapse third party voters into the larger "nonpartisan" category, we elected to retain more specificity during the data cleaning process to provide the most flexibility in exploring the data.  Prior to finally combining the data, additional variables were added to specify for each row the election year, whether it was a presidential or gubernatorial year, and whether it was a primary or general election.
+
+# Methods
+
+Analysis of the data were conducted using the R statistical computing language [@rpkg] inside the RStudio integrated development environment [@rstudiopkg].  An array of R packages was used to ease data transformation and statistical analysis including: `tidyverse` [@tidyversepkg], `readxl` [@readxlpkg], and `reshape2` [@reshapepkg] for file processing and data cleaning; `ggplot2` [@ggplotpkg] and `scales` [@scalespkg] for plot graphics and labels; `sf` for geographic data [@sfpkg].   This paper has been compiled with reproducibility in mind.  The codes and data necessary to inspect our findings or conduct one's own analysis has been placed into a [GitHub repository](https://github.com/james-geiger/dc-ne-voter-turnout).
+
+We conducted an exploratory analysis of the data to inform the selection of variables to include in a predictive model.  Our exploration focused on voter registrations and turnout—first independently and then with respect to their geography within the county.  Results of our analyses are in four parts: 1) an exploration of the trend in voter registration over time and party, 2) registration within demographic and geographic contexts, 3) voter turnout with regard to election cycle and type, and 4) turnout by geography.  Finally, the findings of our analysis come together to produce a predictive model for voter turnout.
+
+# Results
+
+## Voter Registration
+
+In order to be able to participate in an election, a potential voter must be registered to vote by a certain deadline that is set prior to the election.  We started, then, by exploring changes in voter registration.  Figure \@ref(fig:voter-registration-totals) displays a plot of voter registrations at the deadline for each general election since 1998.  Overall, registrations have grown from `r format(general_df[general_df$election_year == 1998,]$total_registered, big.mark=",")` in 1998 to `r format(general_df[general_df$election_year == 2018,]$total_registered, big.mark=",")` registered voters in 2018, the most recent year that general election data were available.  Over the same period, the group of voters realizing the most growth were nonpartisan/third party voters.  While nonpartisan and third party voters accounted for only `r format((general_df[general_df$election_year == 1998,]$third_party_registered/general_df[general_df$election_year == 1998,]$total_registered)*100,digits=4,nnsmall = 2)`% of the electorate in 1998, the same group twenty years later represented `r format((general_df[general_df$election_year == 2018,]$third_party_registered/general_df[general_df$election_year == 2018,]$total_registered)*100,digits=4,nnsmall = 2)`% of the electorate.  Partisan registrations have remained relatively uniform.
+
+```{r voter-registration-totals, include = TRUE, fig.align='center', fig.cap="Plot of voter registration by party affiliation.  Since 2000, voter registration has increased.  These increases are mostly seen in nonpartisan/third party registrations.", fig.dim=c(7, 4)}
+voter_registration_totals_plot
+```
+
+Discussion of voter registration growth must be understood within the broader context of population growth within the county overall.  The earliest data available from the American Community Survey (ACS) that included detailed geography began in 2006 and extended to 2018.  Figure \@ref(fig:population-growth-trend) displays these data over time with a linear model overlaid to display trend.  Over this period, the population in Douglas County grew `r format(((demographicsByYear[7,]$total - demographicsByYear[1,]$total)/demographicsByYear[1,]$total)*100, digits=4, nsmall=2)`% from `r format(demographicsByYear[1,]$total, big.mark=",")` in 2006 to `r format(demographicsByYear[7,]$total, big.mark=",")` in 2018.  Over this same period, voter registrations increased `r format((((general_df[general_df$election_year == 2018,]$total_registered)-(general_df[general_df$election_year == 2006,]$total_registered))/general_df[general_df$election_year == 2006,]$total_registered)*100, digits=4, nsmall=2)`%, which is in-line with population growth overall.
+
+```{r population-growth-trend, include=TRUE, fig.align='center', fig.dim=c(5, 3.5), fig.cap="Plot of Douglas County population growth between 2006 to 2018. Growth is projected using a linear model to 2020. The regression line from the linear model is shown in blue, with 95-percent confidence intervals displayed in the grey shaded band." }
+population_growth_trend_plot
+```
+
+With this in mind, we turned our attention to any shifts in demographics of the county populous that could inform or impact voter behavior overall.  Because the aggregate voter registration and turnout data available through the election commission do not include any demographic information such as age, sex, race, we make certain inferences based on demographic changes observed in the ACS data.  We identified race as one such salient factor upon which to draw inference and explored further.  (The ACS makes no distinction between race and ethnicity in their data gathering.  For the purposes of this analysis, we will use the terms interchangeably, recognizing that doing so is a limitation of the data overall.)  Figure \@ref(fig:population-by-race) displays the change in population by race over the same period.  The plot makes clear that persons who identify primarily as White/Caucasian far outnumber all other identified ethnic groups.  However, growth in this group also appears to be contributing most to population growth overall.
+
+```{r population-by-race, include=TRUE, fig.align='center', fig.cap="Plot of Douglas County population growth from 2006-2018, grouped by race.  White/Caucasian persons far outnumber any other racial group individually and in aggregate.", fig.dim=c(7.5, 3.5)}
+population_by_race_plot
+```
+
+Although this observed disparity in population growth cannot directly be correlated with changes in voter registration or turnout, a geographic analysis of voter registration and population distribution may provide additional context.  We first mapped the proportion of Democrat vs. Republican registrants by voting precincts, shown in Figure \@ref(fig:registration-by-precinct).  Taking only partisan voter registration into account, deeper shades of blue indicate precincts with higher proportion of Democrats, where deeper shades of red indicate a higher proportion of registered Republicans.  The lightest shades on the map mark an even balance between the two parties.
+
+```{r registration-by-precinct, include=TRUE, fig.align='center', fig.cap="Plot of voter registration weight by party. Precincts with higher Democrat registrants are displayed in darker shades of blue, precincts with higher Republican registrants\nare displayed in darker shades of red. Third party/Nonpartisan registrants are not included.", fig.dim=c(5, 2.5)}
+registration_by_precinct_plot
+```
+
+The geographic distribution of Democrats tends to be clustered in the north- and southeastern portions of the county.  Moving from east to west, registered voters begin to lean more Republican, with the highest concentration in the westernmost parts of the county.  The area in-between these two groups, roughly correlating with central Omaha, appears to be evenly distributed between the two parties.  While this plot is interesting on its own, it becomes more revealing when paired with a similar plot exploring the distribution of racial groups in the county.   Figure \@ref(fig:geography-by-race) maps the proportion of persons identified as primarily White/Caucasian vs. all other racial groups overlaid over the outline of voting precincts in the county.  Areas which tend to be less White also tend to have more registered Democrats.
+
+```{r geography-by-race, include=TRUE, fig.align='center', fig.cap="Geographic distribution of the Douglas County population as of 2018, faceted by race.  Deeper shades of green indicate a higher proportion of persons of that racial group residing in the area.", fig.dim=c(6, 4)}
+geography_by_race_plot
+```
+
+## Voter Turnout
+
+Next, we turned to explore voter turnout which is the proportion of people who were registered to vote in any given year and who subsequently voted in an election.  We conducted two analyses, first examining turnout in presidential compared to non-presidential election years, then evaluating differences in turnout between primary and general elections.
+
+Figure \@ref(fig:turnout-by-cycle) displays election turnout grouped by year of election type—whether presidential or non-presidential—and faceted by a voter's political affiliation.  For this exploration, turnout was considered for each primary and general election in sum.   Voter turnout in Douglas County has been consistently higher for presidential elections compared to non-presidential elections over all the elections included in this analysis.  Broken out by political party, Republicans tended to turn out in higher numbers overall, averaging `r format(mean(pres_gub$republican_turnout)*100, digits=4, nsmall=2)`% turnout compared to Democrats who averaged `r format(mean(pres_gub$democrat_turnout)*100, digits=4, nsmall=2)`.  Although certain parties broke trend in certain years—for instance, Republicans turned out noticeably higher in 2006—trends remained fairly flat.
+
+
+```{r turnout-by-cycle, include=TRUE, fig.align='center', fig.cap="Plot of election turnout by election cycle faceted by party registration.  Election turnout is consistently higher during presidential election cycles both overall and across all party affiliations.", fig.dim=c(5.5, 3.5)}
+turnout_by_cycle_plot
+```
+
+To better understand how the primary and the general election turnouts have changed over the years, a plot comparing the primary and the general election turnouts faceted by different parties is displayed in Figure \@ref(fig:turnout-by-type). As is seen in the plot, the general election turnout rate has been higher than the primary election turnout rate for every election in the past 20 years, averaging `r format(mean(pri_vs_gen[pri_vs_gen$election_type == "general",]$total_turnout)*100, digits=4, nsmall=2)`% turnout in general elections compared to an average turnout in primary elections of `r format(mean(pri_vs_gen[pri_vs_gen$election_type == "primary",]$total_turnout)*100, digits=4, nsmall=2)`%.  This surge in turnout during the general election could be due to greater passion and interest in voting in general elections.  However, the changing pattern of turnout rate is shown to be different for each type of election. The seasonality in turnout is even more evident in Figure \@ref(fig:turnout-by-type)—presidential election years align with the spikes in each line.  The group who tended to turn out the least overall was nonpartisan/third party voters, averaging just `r format(mean(pri_vs_gen[pri_vs_gen$election_type == "general",]$third_party_turnout)*100, digits=4, nsmall=2)`% turnout in general and `r format(mean(pri_vs_gen[pri_vs_gen$election_type == "primary",]$third_party_turnout)*100, digits=4, nsmall=2)`% turnout in primary elections.
+
+```{r turnout-by-type, include=TRUE, fig.align='center', fig.cap="Plot of election turnout by election type faceted by party registration.  Election turnout is consistently higher during general elections both overall and across all party affiliations.  Overall, the highest turnout observed to date occurred during the 2008 general election.", fig.dim=c(5.5, 3.5)}
+turnout_by_type_plot
+```
+
+# Creating a Predictive Model
+
+Given our findings on voter registration and turnout in certain areas of the county and across different types of elections, we sought to answer whether a predictive model of voter turnout could be generated that would have good predictive power.  While our model is specific to Douglas County, a model that uses similar variables is likely to provide similar results.  Although a number of predictive models could have been fit to this data set, we selected a linear regression model for its simplicity in training and ease of explanation.
+
+The findings from our exploratory analysis indicated that the variables likely to be most important to prediction were the number of people registered to vote along with the election type and cycle.  Certainly a wide variety of other exogenous variables could provide additional context to the model, including precinct-level trends and demographics.  For instance, if we identify that Democrats tend to vote more than Republicans, precincts with more registered Democrats would tend to have higher voter participation.  However, we take the position that a simple model with good accuracy can be applied easier and more consistently than a complex model that might only marginally increase predictive accuracy.
+
+```{r turnout-predict, include=TRUE, fig.align='center', fig.cap="Plot predicting voter turnout in Douglas County for the 2020 presidential general election.  A linear model was fit including the number of voter registrations, turnout in the primary election, and the change in voter registrations between the primary and general election to predict general turnout. The model predicted a sharp increase in turnout compared to the previous election.", fig.dim=c(5.5, 3.5)}
+turnout_predict_plot
+```
+
+Voter participation in presidential general elections is presented with the predicted value of our model in Figure \@ref(fig:turnout-predict).  The total number of voters participating in the 2020 election as predicted by our model was `r format(round(pred[[1]], 0), big.mark = ",")`.  The model was trained and predicted prior to the election commission releasing their official turnout results.  The actual number of people who voted in the most recent election was 278,509—a difference of only `r format(round(278509 - pred[[1]],0), big.mark = ",")` voters compared to our prediction.  Thus, this model could be employed as a starting-point for the Douglas County election commission—and perhaps other election commissions across the country—to predict voter turnout in presidential elections.
+
+# Discussion & Conclusion
+
+With few exceptions, elections in Douglas County display relatively stable trends.  Voter registrations have grown in line with population growth since 2006; however, similar growth in voter turnout has not been realized.  Instead, increases in the number of persons voting is likely to do more with an increase in population overall.  Voters tend to turn out in higher numbers for presidential general elections, and turn out the least for non-presidential primary elections.  Republicans tend to vote more consistently than Democrats and other nonpartisan/third party voters.  A model trained on these factors was able to predict overall voter turnout in the 2020 presidential general election to within 3,000 voters.  Election commissions that observe similar patterns in their electorate to those discussed in this paper could employ a similar model to predict turnout in their own elections.
+
+## Limitations & Future Directions
+
+A number of minor technical limitations did exist for this analysis—chiefly among them the lack of detail in recent Census Bureau data and the lack of historical Douglas County ward/precinct maps.  A more thorough exploration of geographic features of these data was therefore limited.  Furthermore, an analysis of how turnout may have an effect on the *outcome* of an election was not possible with this data set.  Although Douglas County is the largest portion of Nebraska's second congressional district, certain portions of Sarpy County to its immediate south are also included.  Future reports could work to aggregate the data from the election commissions of both Douglas and Sarpy counties to make such an assessment.
+
+With regard to our predictive model, the 2020 primary and general elections have been unlike any other in recent history, and certainly unlike any election included in this analysis in terms of the continuously fraught, polarized, and divisive nature of electoral politics leading up to election day[^4].  These factors are not easily included in any predictive model.  It is certainly possible that the model presented in this paper over-predicts turnout, but, due to higher-than-average interest in the electoral process, more people participated in the election thus masking any over-prediction.  This limitation could be explored in future work by including more historical elections allowing for a wider range of data to be split for model training and testing.  Attempts to do so with the current data set would begin to run into issues with the $n-k$ assumption in linear modeling.
+
+Finally, future work should take into greater account the demographic nature of voter registration and electoral participation; these factors are inexorably linked in US politics.  Many election commissions keep more detailed information about voters and their individual participation in elections over time.  These individual "voter files" could allow for more thorough analysis, including broader or more hyper-specific geographical trends that don't fit well into a ward/precinct structure.
+
+[^4]: The authors are unable to provide a specific citation.  To compile a sufficient list of citations supporting this point would require more time than the analysis itself.
+
+\newpage
+
+# Bibliography
